@@ -1,4 +1,4 @@
-package com.example.LUPP_API.domain.users;
+package com.example.LUPP_API.domain.Usuario;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
