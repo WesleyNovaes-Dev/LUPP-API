@@ -13,8 +13,7 @@ public class LuppApiApplication {
 	}
 
 	@RestController
-	public class HelloController {
-
+	static class HelloController {
 		@GetMapping("/")
 		public String hello() {
 			return "Hello World";
