@@ -1,4 +1,4 @@
-package com.example.LUPP_API.controllers;
+package com.example.LUPP_API.controller;
 
 import com.example.LUPP_API.domain.user.AuthenticationDTO;
 import com.example.LUPP_API.domain.user.LoginResponseDTO;

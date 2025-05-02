@@ -1,4 +1,4 @@
-package com.example.LUPP_API.services;
+package com.example.LUPP_API.service;
 
 import com.example.LUPP_API.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
