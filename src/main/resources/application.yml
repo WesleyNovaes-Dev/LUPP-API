@@ -1,5 +1,0 @@
-# application.yml
-spring:
-  flyway:
-    clean-disabled: false
-    clean-on-validation-error: true
