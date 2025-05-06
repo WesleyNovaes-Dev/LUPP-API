@@ -14,6 +14,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+//import static org.springframework.security.config.Customizer.withDefaults;
+
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfigurations {
@@ -46,6 +49,28 @@ public class SecurityConfigurations {
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
+
+
+    /* Bean para validar Cors
+    @Bean
+public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http
+      .csrf(csrf -> csrf.disable())
+      .cors(withDefaults())                 //  <-- usa o WebMvcConfigurer
+      .sessionManagement(sm -> sm
+          .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+      .authorizeHttpRequests(auth -> auth
+          .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()   // libera o preflight
+          .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/register").permitAll()
+          .anyRequest().authenticated()
+      )
+      .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
+
+    return http.build();
+}
+
+*/
+     */
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
