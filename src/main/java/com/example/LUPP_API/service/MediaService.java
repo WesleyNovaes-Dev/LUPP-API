@@ -1,6 +1,7 @@
 package com.example.LUPP_API.service;
 
 
+import com.example.LUPP_API.Utils.AuthUtils;
 import com.example.LUPP_API.domain.Question.Question;
 import com.example.LUPP_API.domain.Question.QuestionRequestDTO;
 import com.example.LUPP_API.domain.Question.QuestionResponseDTO;
@@ -24,6 +25,9 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 @Service
 @Transactional
 public class MediaService {
@@ -33,6 +37,10 @@ public class MediaService {
 
     @Autowired
     private QuestionRepository questionRepository;
+
+    @Autowired
+    private AuthUtils authUtils;
+
 
     // Cria nova mídia (com ou sem perguntas)
     public MediaResponseDTO createMedia(MediaRequestDTO dto) {
@@ -49,6 +57,7 @@ public class MediaService {
         media.setCategory(dto.getCategory());
         media.setMediaUrl(dto.getMediaUrl());
         media.setType(dto.getType());
+        media.setUserId(authUtils.getAuthenticatedUserId());
         media.setCreationDate(LocalDateTime.now());
 
         // Se for QUESTION, adiciona perguntas e alternativas
@@ -83,6 +92,15 @@ public class MediaService {
     // Filtra por categoria
     public List<MediaResponseDTO> getMediaByCategory(String category) {
         List<Media> medias = mediaRepository.findByCategory(category);
+        return medias.stream().map(this::toMediaDTO).collect(Collectors.toList());
+    }
+
+    // Filtra por type
+    public List<MediaResponseDTO> getMediaByType(String type) {
+        List<Media> medias = mediaRepository.findByType(MediaType.valueOf(type));
+        if (medias.isEmpty()) {
+            return Collections.emptyList(); // Pode retornar uma lista vazia, caso não encontre nenhum resultado
+        }
         return medias.stream().map(this::toMediaDTO).collect(Collectors.toList());
     }
 
@@ -181,18 +199,23 @@ public class MediaService {
     // Mapeia entidade Media para DTO
     private MediaResponseDTO toMediaDTO(Media media) {
         List<QuestionResponseDTO> qDtos = media.getQuestions().stream()
-                .map(this::toQuestionDTO).collect(Collectors.toList());
+                .map(this::toQuestionDTO) // Mapeia cada pergunta para seu DTO
+                .collect(Collectors.toList());
+
+        // Retorna o MediaResponseDTO com os dados de media
         return new MediaResponseDTO(
-                media.getId(),
-                media.getTitle(),
-                media.getDescription(),
-                media.getCategory(),
-                media.getMediaUrl(),
-                media.getCreationDate(),
-                media.getType(),
-                qDtos
+                media.getId(),                // UUID
+                media.getTitle(),             // Título da mídia
+                media.getDescription(),       // Descrição da mídia
+                media.getCategory(),          // Categoria
+                media.getMediaUrl(),          // URL da mídia
+                media.getCreationDate(),      // Data de criação
+                media.getType(),              // Tipo de mídia (POST, QUESTION, etc.)
+                qDtos,                        // Lista de perguntas (se houver)
+                media.getUserId()             // ID do usuário associado
         );
     }
+
 
     // Mapeia entidade Question para DTO
     private QuestionResponseDTO toQuestionDTO(Question question) {
@@ -206,4 +229,8 @@ public class MediaService {
                 aDtos
         );
     }
+
+
+
+
 }

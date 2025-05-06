@@ -32,6 +32,8 @@ public class Media {
     @Column(name = "media_url")
     private String mediaUrl;
 
+    private UUID userId;
+
     @Column(name = "creation_date")
     private LocalDateTime creationDate;
 

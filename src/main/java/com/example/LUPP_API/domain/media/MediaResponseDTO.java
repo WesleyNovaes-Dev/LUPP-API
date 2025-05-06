@@ -21,4 +21,7 @@ public class MediaResponseDTO {
     private LocalDateTime creationDate;
     private MediaType type;
     private List<QuestionResponseDTO> questions;
+
+    // Incluindo o userId no DTO de resposta
+    private UUID userId;
 }

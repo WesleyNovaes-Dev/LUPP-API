@@ -1,12 +1,11 @@
 package com.example.LUPP_API.domain.media;
 
-
 import com.example.LUPP_API.domain.Question.QuestionRequestDTO;
-
 import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -26,4 +25,7 @@ public class MediaRequestDTO {
     private MediaType type; // Apenas POST ou QUESTION
 
     private List<QuestionRequestDTO> questions;
+
+    // Adicionando o campo userId para vincular o usuário
+    private UUID userId;
 }
