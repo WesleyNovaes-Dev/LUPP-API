@@ -14,7 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-//import static org.springframework.security.config.Customizer.withDefaults;
 
 
 @Configuration
@@ -27,6 +26,7 @@ public class SecurityConfigurations {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return  httpSecurity
                 .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
@@ -39,7 +39,7 @@ public class SecurityConfigurations {
 
                         .requestMatchers(HttpMethod.GET, "/api/media/type/POST").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/media/type/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/media/type/**").hasRole("USER")
+
 
                         //.requestMatchers(HttpMethod.POST, "/product").hasRole("ADMIN")
                         //.requestMatchers(HttpMethod.GET, "/product").permitAll()
@@ -50,26 +50,6 @@ public class SecurityConfigurations {
                 .build();
     }
 
-
-    /* Bean para validar Cors
-    @Bean
-public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http
-      .csrf(csrf -> csrf.disable())
-      .cors(withDefaults())                 //  <-- usa o WebMvcConfigurer
-      .sessionManagement(sm -> sm
-          .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-      .authorizeHttpRequests(auth -> auth
-          .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()   // libera o preflight
-          .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/register").permitAll()
-          .anyRequest().authenticated()
-      )
-      .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
-
-    return http.build();
-}
-
-*/
 
 
     @Bean
