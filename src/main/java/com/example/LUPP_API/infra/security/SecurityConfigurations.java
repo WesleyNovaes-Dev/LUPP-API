@@ -13,64 +13,52 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-//import static org.springframework.security.config.Customizer.withDefaults;
-
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfigurations {
+
     @Autowired
     SecurityFilter securityFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        return  httpSecurity
+        return httpSecurity
+                .cors() // ⬅️ Ativa CORS
+                .and()
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
                         .requestMatchers(HttpMethod.GET, "/").permitAll()
-
-                        //.requestMatchers(HttpMethod.GET, "/api/media").permitAll()
-
                         .requestMatchers(HttpMethod.GET, "/api/media/category/**").permitAll()
-
                         .requestMatchers(HttpMethod.GET, "/api/media/type/POST").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/media/type/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/media/type/**").hasRole("USER")
-
-                        //.requestMatchers(HttpMethod.POST, "/product").hasRole("ADMIN")
-                        //.requestMatchers(HttpMethod.GET, "/product").permitAll()
-
+                        .requestMatchers(HttpMethod.GET, "/api/media/type/**").hasAnyRole("ADMIN", "USER")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
-
-    /* Bean para validar Cors
+    // ✅ Configuração de CORS
     @Bean
-public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http
-      .csrf(csrf -> csrf.disable())
-      .cors(withDefaults())                 //  <-- usa o WebMvcConfigurer
-      .sessionManagement(sm -> sm
-          .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-      .authorizeHttpRequests(auth -> auth
-          .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()   // libera o preflight
-          .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/register").permitAll()
-          .anyRequest().authenticated()
-      )
-      .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://localhost:3000")); // ou "*", se quiser permitir todos
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true); // necessário se usar cookies ou Authorization headers
 
-    return http.build();
-}
-
-*/
-
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -81,8 +69,4 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
-
-
-
-
 }
