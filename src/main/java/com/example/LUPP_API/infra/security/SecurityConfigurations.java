@@ -13,36 +13,38 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfigurations {
+
     @Autowired
     SecurityFilter securityFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        return  httpSecurity
+        return httpSecurity
+                .cors() // ⬅️ Ativa CORS
+                .and()
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
                         .requestMatchers(HttpMethod.GET, "/").permitAll()
-
-                        //.requestMatchers(HttpMethod.GET, "/api/media").permitAll()
-
                         .requestMatchers(HttpMethod.GET, "/api/media/category/**").permitAll()
-
                         .requestMatchers(HttpMethod.GET, "/api/media/type/POST").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/media/type/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/media/type/**").hasAnyRole("ADMIN", "USER")
 
+                        .requestMatchers(HttpMethod.GET, "/api/media/**").hasAnyRole("ADMIN")
 
-                        //.requestMatchers(HttpMethod.POST, "/product").hasRole("ADMIN")
-                        //.requestMatchers(HttpMethod.GET, "/product").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/media/search/**").permitAll()
+
 
                         .anyRequest().authenticated()
                 )
@@ -50,7 +52,23 @@ public class SecurityConfigurations {
                 .build();
     }
 
-
+    // ✅ Configuração de CORS
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        // Permitir qualquer origem (curinga) com credenciais
+        configuration.setAllowedOriginPatterns(List.of("*"));
+        // Métodos HTTP permitidos
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        // Todos os cabeçalhos permitidos
+        configuration.setAllowedHeaders(List.of("*"));
+        // Permitir envio de cookies/credenciais
+        configuration.setAllowCredentials(true);
+        // Registrar esta configuração para todos os caminhos da API
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -61,8 +79,4 @@ public class SecurityConfigurations {
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
-
-
-
-
 }

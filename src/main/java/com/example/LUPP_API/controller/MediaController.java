@@ -47,37 +47,6 @@ public class MediaController {
         return user.getId();  // Retorna o user_id do usuário logado
     }
 
-
-    /*
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<MediaResponseDTO> createMediaJson(
-            @RequestBody @Validated MediaRequestDTO dto) {
-
-        MediaResponseDTO created = mediaService.createMedia(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
-    }
-
-    /**
-     * 2) Criar mídia via multipart/form-data (arquivo + data JSON)
-     *    Content-Type: multipart/form-data
-     /*
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<MediaResponseDTO> createMediaMultipart(
-            @RequestPart("file") MultipartFile file,
-            @RequestPart("data") @Validated MediaRequestDTO dto) {
-
-        // 1) Faz upload do arquivo ao S3
-        String url = awsS3Service.uploadFile(file);
-        // 2) Preenche a URL no DTO
-        dto.setMediaUrl(url);
-        // 3) Persiste a mídia
-        MediaResponseDTO created = mediaService.createMedia(dto);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
-    }
-*/
-
-
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<MediaResponseDTO> createMediaJson(
             @RequestBody @Validated MediaRequestDTO dto) {
@@ -130,9 +99,9 @@ public class MediaController {
     }
 
     // Pesquisar por query
-    @GetMapping("/search")
-    public ResponseEntity<List<MediaResponseDTO>> searchMedia(@RequestParam String query) {
-        return ResponseEntity.ok(mediaService.searchMedia(query));
+    @GetMapping("/search/{search}")
+    public ResponseEntity<List<MediaResponseDTO>> searchMedia(@PathVariable String search) {
+        return ResponseEntity.ok(mediaService.searchMedia(search));
     }
 
     // Buscar por ID
