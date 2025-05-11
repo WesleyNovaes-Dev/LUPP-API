@@ -38,9 +38,13 @@ public class SecurityConfigurations {
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
                         .requestMatchers(HttpMethod.GET, "/").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/media/category/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/media/type/POST").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/media/type/**").hasAnyRole("ADMIN", "USER")
 
+                        //provisórios
+                        .requestMatchers(HttpMethod.GET, "/auth/**").permitAll()
+
+
+                        .requestMatchers(HttpMethod.GET, "/api/media/type/**").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.GET, "/api/media/type/POST").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/media/**").hasAnyRole("ADMIN")
 
                         .requestMatchers(HttpMethod.GET, "/api/media/search/**").permitAll()
