@@ -33,5 +33,6 @@ CREATE TABLE users (
                        login TEXT NOT NULL UNIQUE,
                        password TEXT NOT NULL,
                        role TEXT NOT NULL,
-                       name TEXT NOT NULL
+                       name TEXT NOT NULL,
+                       points integer NOT NULL
 );
