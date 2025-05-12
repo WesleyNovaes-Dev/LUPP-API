@@ -1,9 +1,6 @@
 package com.example.LUPP_API.controller;
 
-import com.example.LUPP_API.domain.user.AuthenticationDTO;
-import com.example.LUPP_API.domain.user.LoginResponseDTO;
-import com.example.LUPP_API.domain.user.RegisterDTO;
-import com.example.LUPP_API.domain.user.User;
+import com.example.LUPP_API.domain.user.*;
 import com.example.LUPP_API.infra.security.TokenService;
 import com.example.LUPP_API.repositories.UserRepository;
 import jakarta.validation.Valid;
@@ -11,8 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("auth")
@@ -23,7 +24,8 @@ public class AuthenticationController {
     private UserRepository repository;
     @Autowired
     private TokenService tokenService;
-    @Autowired
+
+
 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data){
@@ -57,10 +59,23 @@ public class AuthenticationController {
         return ResponseEntity.ok(this.repository.findAll());
     }
 
-    @GetMapping("my-profile")
-    public ResponseEntity getMyProfile(){
-        return ResponseEntity.ok().build();
+    // Método para recuperar o ID do usuário logado
+    private UUID getLoggedUserId() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        User user = (User) userDetails;
+        return user.getId();  // Retorna o user_id do usuário logado
     }
+
+    @GetMapping("/my-profile")
+    public ResponseEntity<?> getMyProfile() {
+        UUID userId = getLoggedUserId();
+
+        return repository.findById(userId)
+                .map(user -> ResponseEntity.ok(UserDTO.from(user)))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
 
 
 }
